@@ -8,17 +8,16 @@ public class LanderBehaviour : MonoBehaviour
     public Rigidbody2D rigidbody2d;
     private float gravity_scale;
     private const int acceleration = 3;
-    private Vector3 amount_rotated;
 
     public float velocity_x, velocity_y;
     public float gravity;
     public float time;
 
-    public enum Tilt { 
+    private enum Tilt { 
         n_ninety = -6 , n_seventyfive = -5, n_sixty = -4, n_fortyfive = -3, n_thirty = -2, n_fifteen = -1,
         zero = 0, 
         p_fifteen = 1, p_thirty = 2, p_fortyfive = 3, p_sixty = 4, p_seventyfive = 5, p_ninety = 6};
-    public Tilt tilt;
+    private Tilt tilt;
 
 
     // Start is called before the first frame update
@@ -26,7 +25,6 @@ public class LanderBehaviour : MonoBehaviour
     {
         gravity_scale = rigidbody2d.gravityScale;
         rigidbody2d.velocity = new Vector2(82.0f, 0.0f);
-        amount_rotated = new Vector3(0.0f, 0.0f, 15.0f);
     }
 
     // Update is called once per frame
