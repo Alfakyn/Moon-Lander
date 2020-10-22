@@ -7,11 +7,10 @@ public class LanderBehaviour : MonoBehaviour
 {
     public Rigidbody2D rigidbody2d;
     private float gravity_scale;
-    private const int acceleration = 3;
+    private const int ACCELERATION = 3;
+    private const float HORIZONTAL_DRAG_FACTOR = 0.001f;
 
-    public float velocity_x, velocity_y;
-    public float gravity;
-    public float time;
+    private float speed_x, speed_y;
 
     private enum Tilt { 
         n_ninety = -6 , n_seventyfive = -5, n_sixty = -4, n_fortyfive = -3, n_thirty = -2, n_fifteen = -1,
@@ -30,6 +29,34 @@ public class LanderBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        checkTurnInput();
+    }
+
+    private void FixedUpdate()
+    {
+        checkBoosterInput();
+        checkHorizontalDrag();
+        speed_x = rigidbody2d.velocity.x;
+        speed_y = rigidbody2d.velocity.y;
+    }
+
+    void checkBoosterInput()
+    {
+        if (Input.GetKey(KeyCode.UpArrow) == true)
+        {
+            rigidbody2d.velocity += new Vector2(transform.up.x, transform.up.y) * ACCELERATION * gravity_scale * Time.fixedDeltaTime;
+        }
+    }
+
+    void checkHorizontalDrag()
+    {
+        Vector2 velocity = rigidbody2d.velocity;
+        velocity.x *= (1.0f - HORIZONTAL_DRAG_FACTOR);
+        rigidbody2d.velocity = velocity;
+    }
+
+    void checkTurnInput()
+    {
         if (Input.GetKeyDown(KeyCode.LeftArrow) == true)
         {
             if ((int)tilt < 6)
@@ -45,23 +72,6 @@ public class LanderBehaviour : MonoBehaviour
                 --tilt;
                 updateRotation();
             }
-        }
-    }
-
-    private void FixedUpdate()
-    {
-        checkInput();
-        time += Time.fixedDeltaTime;
-        gravity = Physics2D.gravity.y;
-        velocity_x = rigidbody2d.velocity.x;
-        velocity_y = rigidbody2d.velocity.y;
-    }
-
-    void checkInput()
-    {
-        if (Input.GetKey(KeyCode.UpArrow) == true)
-        {
-            rigidbody2d.velocity += new Vector2(transform.up.x, transform.up.y) * acceleration * gravity_scale * Time.fixedDeltaTime;
         }
     }
 
@@ -109,5 +119,14 @@ public class LanderBehaviour : MonoBehaviour
                 transform.rotation = Quaternion.Euler(0.0f, 0.0f, 90.0f);
                 break;
         }
+    }
+
+    public float getSpeedX()
+    {
+        return speed_x;
+    }
+    public float getSpeedY()
+    {
+        return speed_y;
     }
 }
