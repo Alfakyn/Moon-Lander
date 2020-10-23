@@ -129,4 +129,18 @@ public class LanderBehaviour : MonoBehaviour
     {
         return speed_y;
     }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "WinCollider")
+        {
+            Debug.Log("You win");
+            UnityEditor.EditorApplication.isPlaying = false;
+        }
+        if (collision.gameObject.tag == "MoonSurface")
+        {
+            Debug.Log("You lose");
+            UnityEditor.EditorApplication.isPlaying = false;
+        }
+    }
 }
