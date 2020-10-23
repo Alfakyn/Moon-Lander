@@ -134,12 +134,26 @@ public class LanderBehaviour : MonoBehaviour
     {
         if (collision.gameObject.tag == "WinCollider")
         {
-            Debug.Log("You win");
+            if(gameObject.transform.eulerAngles.z != 0)
+            {
+                if (speed_x <= 10 && speed_y <= 10)
+                {
+                    Debug.Log("You win");
+                }
+                else
+                {
+                    Debug.Log("You lose. Landed with too much speed");
+                }
+            }
+            else
+            {
+                Debug.Log("You lose. Landed with rotation");
+            }
             UnityEditor.EditorApplication.isPlaying = false;
         }
         if (collision.gameObject.tag == "MoonSurface")
         {
-            Debug.Log("You lose");
+            Debug.Log("You lose. Collision on a wall");
             UnityEditor.EditorApplication.isPlaying = false;
         }
     }
