@@ -52,7 +52,7 @@ public class DisplayBehaviour : MonoBehaviour
 
     void updateSpeeds()
     {
-        speed_x_value.text = ((int)lander_behaviour.getSpeedX()).ToString();
-        speed_y_value.text = ((int)lander_behaviour.getSpeedY()).ToString();
+        speed_x_value.text = Mathf.Ceil(lander_behaviour.getSpeedX()).ToString();
+        speed_y_value.text = Mathf.Ceil(lander_behaviour.getSpeedY()).ToString();
     }
 }
