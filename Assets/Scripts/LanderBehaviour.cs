@@ -38,6 +38,9 @@ public class LanderBehaviour : MonoBehaviour
 
         int direction_x = -(position_x / Mathf.Abs(position_x));
         rigidbody2d.velocity = new Vector2(82 * direction_x, 0);
+
+        transform.rotation = Quaternion.Euler(Vector3.zero);
+        tilt = Tilt.zero;
     }
 
     // Update is called once per frame
@@ -168,11 +171,11 @@ public class LanderBehaviour : MonoBehaviour
     {
         if (collision.gameObject.tag.Equals("WinCollider"))
         {
-            if(gameObject.transform.eulerAngles.z != 0)
+            if(gameObject.transform.eulerAngles.z == 0)
             {
                 if (speed_x <= 15 && speed_y <= 15)
                 {
-                    display_behaviour.addScore(BASE_SCORE * collision.gameObject.GetComponent<WinColliderBehaviour>().getMultiplier());                    
+                    display_behaviour.addScore(BASE_SCORE * collision.gameObject.GetComponent<WinColliderBehaviour>().getMultiplier());
                     Debug.Log("You win");
                 }
                 else

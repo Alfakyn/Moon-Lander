@@ -36,15 +36,16 @@ public class GameBehaviour : MonoBehaviour
         switch (next_state)
         {
             case GameState.Running:
+                lander_behaviour.rigidbody2d.WakeUp();
                 lander_behaviour.initializeLander();
                 GameObject[] win_colliders = GameObject.FindGameObjectsWithTag("WinCollider");
                 foreach(GameObject win_collider in win_colliders)
                 {
                     win_collider.GetComponent<WinColliderBehaviour>().initializeMultipliers();
-                }
+                }                
                 break;
             case GameState.Standby:
-                lander_behaviour.rigidbody2d.velocity = Vector2.zero;
+                lander_behaviour.rigidbody2d.Sleep();
                 standby_timer = 0.0f;
                 break;
         }
