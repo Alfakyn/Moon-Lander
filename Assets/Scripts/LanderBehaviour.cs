@@ -10,6 +10,11 @@ public class LanderBehaviour : MonoBehaviour
     private const float HORIZONTAL_DRAG_FACTOR = 0.001f;
 
     private float speed_x, speed_y;
+    private float fuel;
+
+    public DisplayBehaviour display_behaviour;
+    private const int BASE_SCORE = 50;
+    private const int FUEL_DEPLETE_RATE = 10;
 
     private enum Tilt { 
         n_ninety = -6 , n_seventyfive = -5, n_sixty = -4, n_fortyfive = -3, n_thirty = -2, n_fifteen = -1,
@@ -22,28 +27,44 @@ public class LanderBehaviour : MonoBehaviour
     void Start()
     {
         gravity_scale = rigidbody2d.gravityScale;
-        rigidbody2d.velocity = new Vector2(82.0f, 0.0f);
+        initializeLander();
+        fuel = 1000;
+    }
+
+    public void initializeLander()
+    {
+        int position_x = Random.Range(-960, 961);
+        transform.position = new Vector2(position_x, 370);
+
+        int direction_x = -(position_x / Mathf.Abs(position_x));
+        rigidbody2d.velocity = new Vector2(82 * direction_x, 0);
     }
 
     // Update is called once per frame
     void Update()
     {
-        checkTurnInput();
+        switch (GameBehaviour.game_state)
+        {
+            case GameBehaviour.GameState.Running:
+                checkTurnInput();
+                break;
+            case GameBehaviour.GameState.Standby:
+                break;
+        }
     }
 
     private void FixedUpdate()
     {
-        checkBoosterInput();
-        checkHorizontalDrag();
-        speed_x = rigidbody2d.velocity.x;
-        speed_y = rigidbody2d.velocity.y;
-    }
-
-    void checkBoosterInput()
-    {
-        if (Input.GetKey(KeyCode.UpArrow) == true)
+        switch (GameBehaviour.game_state)
         {
-            rigidbody2d.velocity += new Vector2(transform.up.x, transform.up.y) * ACCELERATION * gravity_scale * Time.fixedDeltaTime;
+            case GameBehaviour.GameState.Running:
+                checkBoosterInput();
+                checkHorizontalDrag();
+                speed_x = rigidbody2d.velocity.x;
+                speed_y = rigidbody2d.velocity.y;
+                break;
+            case GameBehaviour.GameState.Standby:
+                break;
         }
     }
 
@@ -52,6 +73,15 @@ public class LanderBehaviour : MonoBehaviour
         Vector2 velocity = rigidbody2d.velocity;
         velocity.x *= (1.0f - HORIZONTAL_DRAG_FACTOR);
         rigidbody2d.velocity = velocity;
+    }
+
+    void checkBoosterInput()
+    {
+        if (Input.GetKey(KeyCode.UpArrow) == true)
+        {
+            rigidbody2d.velocity += new Vector2(transform.up.x, transform.up.y) * ACCELERATION * gravity_scale * Time.fixedDeltaTime;
+            fuel -= FUEL_DEPLETE_RATE * Time.fixedDeltaTime;
+        }
     }
 
     void checkTurnInput()
@@ -129,14 +159,20 @@ public class LanderBehaviour : MonoBehaviour
         return speed_y;
     }
 
+    public float getFuel()
+    {
+        return fuel;
+    }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.tag == "WinCollider")
+        if (collision.gameObject.tag.Equals("WinCollider"))
         {
             if(gameObject.transform.eulerAngles.z != 0)
             {
-                if (speed_x <= 20 && speed_y <= 20)
+                if (speed_x <= 15 && speed_y <= 15)
                 {
+                    display_behaviour.addScore(BASE_SCORE * collision.gameObject.GetComponent<WinColliderBehaviour>().getMultiplier());                    
                     Debug.Log("You win");
                 }
                 else
@@ -146,14 +182,16 @@ public class LanderBehaviour : MonoBehaviour
             }
             else
             {
+                //Make the lander explode
                 Debug.Log("You lose. Landed with rotation");
             }
-            UnityEditor.EditorApplication.isPlaying = false;
         }
-        if (collision.gameObject.tag == "MoonSurface")
+        if (collision.gameObject.tag.Equals("MoonSurface"))
         {
+            //Make the lander explode
             Debug.Log("You lose. Collision on a wall");
-            UnityEditor.EditorApplication.isPlaying = false;
         }
+
+        GameBehaviour.changeGameState(GameBehaviour.GameState.Standby);
     }
 }

@@ -6,6 +6,7 @@ TagManager:
   tags:
   - WinCollider
   - MoonSurface
+  - Display
   layers:
   - Default
   - TransparentFX
