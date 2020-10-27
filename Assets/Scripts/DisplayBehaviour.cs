@@ -11,7 +11,7 @@ public class DisplayBehaviour : MonoBehaviour
     public TextMeshProUGUI altitude_value, speed_x_value, speed_y_value;
 
     private int score, fuel;
-    private int speed_x, speed_y, altitude;
+    private int altitude;
     private float time;
 
     // Start is called before the first frame update
@@ -21,8 +21,6 @@ public class DisplayBehaviour : MonoBehaviour
         score = 0;
         fuel = 0;
 
-        speed_x = 0;
-        speed_y = 0;
         altitude = 0;
     }
 
