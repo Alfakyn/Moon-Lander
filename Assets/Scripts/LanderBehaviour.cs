@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using System.Threading;
 using UnityEngine;
 
 public class LanderBehaviour : MonoBehaviour
@@ -136,7 +135,7 @@ public class LanderBehaviour : MonoBehaviour
         {
             if(gameObject.transform.eulerAngles.z != 0)
             {
-                if (speed_x <= 10 && speed_y <= 10)
+                if (speed_x <= 20 && speed_y <= 20)
                 {
                     Debug.Log("You win");
                 }
