@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class GameBehaviour : MonoBehaviour
 {
-    public enum GameState { Running, Standby };
+    public enum GameState { Running, Standby, Finish};
     public static GameState game_state;
     public static float standby_timer;
 
@@ -48,8 +48,10 @@ public class GameBehaviour : MonoBehaviour
                 lander_behaviour.rigidbody2d.Sleep();
                 standby_timer = 0.0f;
                 break;
+            case GameState.Finish:
+                lander_behaviour.rigidbody2d.Sleep();
+                break;
         }
-
         game_state = next_state;
     }
 }

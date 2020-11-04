@@ -16,12 +16,12 @@ public class LanderBehaviour : MonoBehaviour
     private const int BASE_SCORE = 50;
     private const int FUEL_DEPLETE_RATE = 10;
 
-    private enum Tilt { 
-        n_ninety = -6 , n_seventyfive = -5, n_sixty = -4, n_fortyfive = -3, n_thirty = -2, n_fifteen = -1,
-        zero = 0, 
-        p_fifteen = 1, p_thirty = 2, p_fortyfive = 3, p_sixty = 4, p_seventyfive = 5, p_ninety = 6};
-    private Tilt tilt;
+    private const float AMOUNT_TO_ROTATE = 15.0f;
+    private float z_rotation;
 
+    private bool has_collided;
+
+    public Animator butt_fire_animator;
 
     // Start is called before the first frame update
     void Start()
@@ -29,6 +29,8 @@ public class LanderBehaviour : MonoBehaviour
         gravity_scale = rigidbody2d.gravityScale;
         initializeLander();
         fuel = 1000;
+
+        z_rotation = 0.0f;
     }
 
     public void initializeLander()
@@ -40,7 +42,8 @@ public class LanderBehaviour : MonoBehaviour
         rigidbody2d.velocity = new Vector2(82 * direction_x, 0);
 
         transform.rotation = Quaternion.Euler(Vector3.zero);
-        tilt = Tilt.zero;
+
+        has_collided = false;
     }
 
     // Update is called once per frame
@@ -50,6 +53,7 @@ public class LanderBehaviour : MonoBehaviour
         {
             case GameBehaviour.GameState.Running:
                 checkTurnInput();
+                convertZRotation();
                 break;
             case GameBehaviour.GameState.Standby:
                 break;
@@ -61,12 +65,20 @@ public class LanderBehaviour : MonoBehaviour
         switch (GameBehaviour.game_state)
         {
             case GameBehaviour.GameState.Running:
-                checkBoosterInput();
+                if (fuel > 0.0f)
+                {
+                    checkBoosterInput();
+                }
+                else
+                {
+                    butt_fire_animator.SetBool("Using Butt Fire", false);
+                }
                 checkHorizontalDrag();
                 speed_x = rigidbody2d.velocity.x;
                 speed_y = rigidbody2d.velocity.y;
                 break;
             case GameBehaviour.GameState.Standby:
+                butt_fire_animator.SetBool("Using Butt Fire", false);
                 break;
         }
     }
@@ -80,76 +92,36 @@ public class LanderBehaviour : MonoBehaviour
 
     void checkBoosterInput()
     {
-        if (Input.GetKey(KeyCode.UpArrow) == true)
+        if (Input.GetKey(KeyCode.UpArrow) == true || Input.GetKey(KeyCode.W) == true)
         {
             rigidbody2d.velocity += new Vector2(transform.up.x, transform.up.y) * ACCELERATION * gravity_scale * Time.fixedDeltaTime;
             fuel -= FUEL_DEPLETE_RATE * Time.fixedDeltaTime;
+            butt_fire_animator.SetBool("Using Butt Fire", true);
+        }
+        else
+        {
+            butt_fire_animator.SetBool("Using Butt Fire", false);
         }
     }
 
     void checkTurnInput()
     {
-        if (Input.GetKeyDown(KeyCode.LeftArrow) == true)
+        if ((Input.GetKeyDown(KeyCode.LeftArrow) == true || Input.GetKeyDown(KeyCode.A) == true) && z_rotation < 90.0f)
         {
-            if ((int)tilt < 6)
-            {
-                ++tilt;
-                updateRotation();
-            }
+            transform.Rotate(0, 0, AMOUNT_TO_ROTATE);
         }
-        else if (Input.GetKeyDown(KeyCode.RightArrow) == true)
+        else if ((Input.GetKeyDown(KeyCode.RightArrow) == true || Input.GetKeyDown(KeyCode.D) == true) && z_rotation > -90.0f)
         {
-            if ((int)tilt > -6)
-            {
-                --tilt;
-                updateRotation();
-            }
+            transform.Rotate(0, 0, -AMOUNT_TO_ROTATE);
         }
     }
 
-    private void updateRotation()
+    private void convertZRotation()
     {
-        switch (tilt)
+        z_rotation = transform.eulerAngles.z;
+        if(z_rotation > 180.0f)
         {
-            case Tilt.n_ninety:
-                transform.rotation = Quaternion.Euler(0.0f, 0.0f, -90.0f);
-                break;
-            case Tilt.n_seventyfive:
-                transform.rotation = Quaternion.Euler(0.0f, 0.0f, -75.0f);
-                break;
-            case Tilt.n_sixty:
-                transform.rotation = Quaternion.Euler(0.0f, 0.0f, -60.0f);
-                break;
-            case Tilt.n_fortyfive:
-                transform.rotation = Quaternion.Euler(0.0f, 0.0f, -45.0f);
-                break;
-            case Tilt.n_thirty:
-                transform.rotation = Quaternion.Euler(0.0f, 0.0f, -30.0f);
-                break;
-            case Tilt.n_fifteen:
-                transform.rotation = Quaternion.Euler(0.0f, 0.0f, -15.0f);
-                break;
-            case Tilt.zero:
-                transform.rotation = Quaternion.Euler(0.0f, 0.0f, 0.0f);
-                break;
-            case Tilt.p_fifteen:
-                transform.rotation = Quaternion.Euler(0.0f, 0.0f, 15.0f);
-                break;
-            case Tilt.p_thirty:
-                transform.rotation = Quaternion.Euler(0.0f, 0.0f, 30.0f);
-                break;
-            case Tilt.p_fortyfive:
-                transform.rotation = Quaternion.Euler(0.0f, 0.0f, 45.0f);
-                break;
-            case Tilt.p_sixty:
-                transform.rotation = Quaternion.Euler(0.0f, 0.0f, 60.0f);
-                break;
-            case Tilt.p_seventyfive:
-                transform.rotation = Quaternion.Euler(0.0f, 0.0f, 75.0f);
-                break;
-            case Tilt.p_ninety:
-                transform.rotation = Quaternion.Euler(0.0f, 0.0f, 90.0f);
-                break;
+            z_rotation -= 360.0f;
         }
     }
 
@@ -169,32 +141,77 @@ public class LanderBehaviour : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.tag.Equals("WinCollider"))
+        if (has_collided == false)
         {
-            if(gameObject.transform.eulerAngles.z == 0)
+            if (collision.gameObject.tag.Equals("WinCollider"))
             {
-                if (speed_x <= 15 && speed_y <= 15)
+                if (z_rotation > -1.0f && z_rotation < 1.0f)
                 {
-                    display_behaviour.addScore(BASE_SCORE * collision.gameObject.GetComponent<WinColliderBehaviour>().getMultiplier());
-                    Debug.Log("You win");
+                    if (Mathf.Abs(speed_x) <= 15.0f && Mathf.Abs(speed_y) <= 15.0f)
+                    {
+                        display_behaviour.addScore(BASE_SCORE * collision.gameObject.GetComponent<WinColliderBehaviour>().getMultiplier());
+                        Debug.Log("You win");
+                        GameBehaviour.changeGameState(GameBehaviour.GameState.Standby);
+                    }
+                    else
+                    {
+                        Debug.Log("You lose. Landed with too much speed");
+                        if (fuel <= 0.0f)
+                        {
+                            Debug.Log("Game Over, you ran out of fuel");
+                            GameBehaviour.changeGameState(GameBehaviour.GameState.Finish);
+                        }
+                        else
+                        {
+                            fuel -= 200.0f;
+                            if (fuel < 0.0f)
+                            {
+                                fuel = 0.0f;
+                            }
+                            GameBehaviour.changeGameState(GameBehaviour.GameState.Standby);
+                        }
+                    }
                 }
                 else
                 {
-                    Debug.Log("You lose. Landed with too much speed");
+                    //Make the lander explode
+                    Debug.Log("You lose. Landed with rotation");
+                    if (fuel <= 0.0f)
+                    {
+                        Debug.Log("Game Over, you ran out of fuel");
+                        GameBehaviour.changeGameState(GameBehaviour.GameState.Finish);
+                    }
+                    else
+                    {
+                        fuel -= 200.0f;
+                        if (fuel < 0.0f)
+                        {
+                            fuel = 0.0f;
+                        }
+                        GameBehaviour.changeGameState(GameBehaviour.GameState.Standby);
+                    }
                 }
             }
-            else
+            if (collision.gameObject.tag.Equals("MoonSurface"))
             {
                 //Make the lander explode
-                Debug.Log("You lose. Landed with rotation");
+                Debug.Log("You lose. Collision on a wall");
+                if (fuel <= 0.0f)
+                {
+                    Debug.Log("Game Over, you ran out of fuel");
+                    GameBehaviour.changeGameState(GameBehaviour.GameState.Finish);
+                }
+                else
+                {
+                    fuel -= 200.0f;
+                    if (fuel < 0.0f)
+                    {
+                        fuel = 0.0f;
+                    }
+                    GameBehaviour.changeGameState(GameBehaviour.GameState.Standby);
+                }
             }
+            has_collided = true;
         }
-        if (collision.gameObject.tag.Equals("MoonSurface"))
-        {
-            //Make the lander explode
-            Debug.Log("You lose. Collision on a wall");
-        }
-
-        GameBehaviour.changeGameState(GameBehaviour.GameState.Standby);
     }
 }
