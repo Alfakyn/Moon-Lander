@@ -14,6 +14,7 @@ public class LanderBehaviour : MonoBehaviour
 
     public DisplayBehaviour display_behaviour;
     private const int BASE_SCORE = 50;
+    private const int WORSE_SCORE = 15;
     private const int FUEL_DEPLETE_RATE = 10;
 
     private const float AMOUNT_TO_ROTATE = 15.0f;
@@ -150,7 +151,13 @@ public class LanderBehaviour : MonoBehaviour
                     if (Mathf.Abs(speed_x) <= 15.0f && Mathf.Abs(speed_y) <= 15.0f)
                     {
                         display_behaviour.addScore(BASE_SCORE * collision.gameObject.GetComponent<WinColliderBehaviour>().getMultiplier());
-                        Debug.Log("You win");
+                        Debug.Log("You landed perfectly!");
+                        GameBehaviour.changeGameState(GameBehaviour.GameState.Standby);
+                    }
+                    else if (Mathf.Abs(speed_x) <= 25.0f && Mathf.Abs(speed_y) <= 25.0f)
+                    {
+                        display_behaviour.addScore(WORSE_SCORE * collision.gameObject.GetComponent<WinColliderBehaviour>().getMultiplier());
+                        Debug.Log("Bumpy landing but OK");
                         GameBehaviour.changeGameState(GameBehaviour.GameState.Standby);
                     }
                     else
