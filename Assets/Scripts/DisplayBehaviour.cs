@@ -9,6 +9,7 @@ public class DisplayBehaviour : MonoBehaviour
 
     public TextMeshProUGUI score_value_TMP, time_value_TMP, fuel_value_TMP;
     public TextMeshProUGUI altitude_value_TMP, speed_x_value_TMP, speed_y_value_TMP;
+    public TextMeshProUGUI standby_message_TMP;
 
     private int score;
     //private int altitude;   //to implement
@@ -93,5 +94,10 @@ public class DisplayBehaviour : MonoBehaviour
         int units = fuel % 10;
 
         fuel_value_TMP.text = thousands.ToString() + hundreds.ToString() + tens.ToString() + units.ToString();
+    }
+
+    public void updateStandbyMessage(string message)
+    {
+        standby_message_TMP.text = message;
     }
 }

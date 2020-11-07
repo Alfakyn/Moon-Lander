@@ -8,9 +8,15 @@ public class GameBehaviour : MonoBehaviour
     public static GameState game_state;
     public static float standby_timer;
 
+    public static GameObject standby_message;
+    public static LanderBehaviour lander_behaviour;
+
     private void Start()
     {
         standby_timer = 0.0f;
+        standby_message = GameObject.FindWithTag("Standby Message");
+        standby_message.SetActive(false);
+        lander_behaviour = GameObject.FindGameObjectWithTag("Player").GetComponent<LanderBehaviour>();
     }
 
     private void Update()
@@ -31,11 +37,14 @@ public class GameBehaviour : MonoBehaviour
 
     public static void changeGameState(GameState next_state)
     {
-        LanderBehaviour lander_behaviour = GameObject.FindGameObjectWithTag("Player").GetComponent<LanderBehaviour>();
+        //LanderBehaviour lander_behaviour = GameObject.FindGameObjectWithTag("Player").GetComponent<LanderBehaviour>();
+        //GameObject standby_message = GameObject.FindWithTag("Standby Message");
         
         switch (next_state)
         {
             case GameState.Running:
+                lander_behaviour.lander_animator.SetTrigger("LanderToDefault");
+                standby_message.SetActive(false);
                 lander_behaviour.rigidbody2d.WakeUp();
                 lander_behaviour.initializeLander();
                 GameObject[] win_colliders = GameObject.FindGameObjectsWithTag("WinCollider");
@@ -45,10 +54,12 @@ public class GameBehaviour : MonoBehaviour
                 }                
                 break;
             case GameState.Standby:
+                standby_message.SetActive(true);
                 lander_behaviour.rigidbody2d.Sleep();
                 standby_timer = 0.0f;
                 break;
             case GameState.Finish:
+                standby_message.SetActive(false);
                 lander_behaviour.rigidbody2d.Sleep();
                 break;
         }

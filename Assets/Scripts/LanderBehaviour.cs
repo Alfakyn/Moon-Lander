@@ -15,21 +15,24 @@ public class LanderBehaviour : MonoBehaviour
     public DisplayBehaviour display_behaviour;
     private const int BASE_SCORE = 50;
     private const int WORSE_SCORE = 15;
-    private const int FUEL_DEPLETE_RATE = 10;
+    private const float INITIAL_FUEL = 250;
+    private const float FUEL_DEPLETE_RATE = 10.0f;
+    private const float FUEL_LOST_ON_EXPLOSION = 200.0f;
 
     private const float AMOUNT_TO_ROTATE = 15.0f;
     private float z_rotation;
 
     private bool has_collided;
 
-    public Animator butt_fire_animator;
+    //public Animator butt_fire_animator;
+    public Animator lander_animator;
 
     // Start is called before the first frame update
     void Start()
     {
         gravity_scale = rigidbody2d.gravityScale;
         initializeLander();
-        fuel = 1000;
+        fuel = INITIAL_FUEL;
 
         z_rotation = 0.0f;
     }
@@ -59,6 +62,11 @@ public class LanderBehaviour : MonoBehaviour
             case GameBehaviour.GameState.Standby:
                 break;
         }
+
+        if (Input.GetKeyUp(KeyCode.UpArrow) == true || Input.GetKeyUp(KeyCode.W) == true)
+        {
+            lander_animator.SetBool("BoosterInput", false);
+        }
     }
 
     private void FixedUpdate()
@@ -72,16 +80,15 @@ public class LanderBehaviour : MonoBehaviour
                 }
                 else
                 {
-                    butt_fire_animator.SetBool("Using Butt Fire", false);
+                    lander_animator.SetBool("BoosterInput", false);
                 }
                 checkHorizontalDrag();
                 speed_x = rigidbody2d.velocity.x;
                 speed_y = rigidbody2d.velocity.y;
                 break;
             case GameBehaviour.GameState.Standby:
-                butt_fire_animator.SetBool("Using Butt Fire", false);
                 break;
-        }
+        }        
     }
 
     void checkHorizontalDrag()
@@ -97,11 +104,7 @@ public class LanderBehaviour : MonoBehaviour
         {
             rigidbody2d.velocity += new Vector2(transform.up.x, transform.up.y) * ACCELERATION * gravity_scale * Time.fixedDeltaTime;
             fuel -= FUEL_DEPLETE_RATE * Time.fixedDeltaTime;
-            butt_fire_animator.SetBool("Using Butt Fire", true);
-        }
-        else
-        {
-            butt_fire_animator.SetBool("Using Butt Fire", false);
+            lander_animator.SetBool("BoosterInput", true);
         }
     }
 
@@ -140,6 +143,26 @@ public class LanderBehaviour : MonoBehaviour
         return fuel;
     }
 
+    private void removeFuel()
+    {
+        float actual_fuel_lost;
+
+        if (fuel < FUEL_LOST_ON_EXPLOSION)
+        {
+            actual_fuel_lost = fuel;
+        }
+        else
+        {
+            actual_fuel_lost = FUEL_LOST_ON_EXPLOSION;
+        }
+
+        fuel -= actual_fuel_lost;
+
+        display_behaviour.updateStandbyMessage("Your lander exploded\n" + ((int)actual_fuel_lost).ToString() + " units of fuel lost");
+        lander_animator.SetTrigger("LanderExplosion");
+        GameBehaviour.changeGameState(GameBehaviour.GameState.Standby);
+    }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (has_collided == false)
@@ -150,72 +173,56 @@ public class LanderBehaviour : MonoBehaviour
                 {
                     if (Mathf.Abs(speed_x) <= 15.0f && Mathf.Abs(speed_y) <= 15.0f)
                     {
-                        display_behaviour.addScore(BASE_SCORE * collision.gameObject.GetComponent<WinColliderBehaviour>().getMultiplier());
-                        Debug.Log("You landed perfectly!");
+                        int score_to_add = BASE_SCORE * collision.gameObject.GetComponent<WinColliderBehaviour>().getMultiplier();
+                        display_behaviour.addScore(score_to_add);
+                        display_behaviour.updateStandbyMessage("Perfect landing!\n" + score_to_add.ToString() + " points");
+                        lander_animator.SetTrigger("LanderToDefault");
                         GameBehaviour.changeGameState(GameBehaviour.GameState.Standby);
                     }
                     else if (Mathf.Abs(speed_x) <= 25.0f && Mathf.Abs(speed_y) <= 25.0f)
                     {
-                        display_behaviour.addScore(WORSE_SCORE * collision.gameObject.GetComponent<WinColliderBehaviour>().getMultiplier());
-                        Debug.Log("Bumpy landing but OK");
+                        int score_to_add = WORSE_SCORE * collision.gameObject.GetComponent<WinColliderBehaviour>().getMultiplier();
+                        display_behaviour.addScore(score_to_add);
+                        display_behaviour.updateStandbyMessage("Bumpy landing\n" + score_to_add.ToString() + " points");
+                        lander_animator.SetTrigger("LanderToDefault");
                         GameBehaviour.changeGameState(GameBehaviour.GameState.Standby);
                     }
                     else
-                    {
-                        Debug.Log("You lose. Landed with too much speed");
+                    {                        
                         if (fuel <= 0.0f)
                         {
-                            Debug.Log("Game Over, you ran out of fuel");
+                            lander_animator.SetTrigger("LanderExplosion");
                             GameBehaviour.changeGameState(GameBehaviour.GameState.Finish);
                         }
                         else
                         {
-                            fuel -= 200.0f;
-                            if (fuel < 0.0f)
-                            {
-                                fuel = 0.0f;
-                            }
-                            GameBehaviour.changeGameState(GameBehaviour.GameState.Standby);
+                            removeFuel();
                         }
                     }
                 }
                 else
-                {
-                    //Make the lander explode
-                    Debug.Log("You lose. Landed with rotation");
+                {                    
                     if (fuel <= 0.0f)
                     {
-                        Debug.Log("Game Over, you ran out of fuel");
+                        lander_animator.SetTrigger("LanderExplosion");
                         GameBehaviour.changeGameState(GameBehaviour.GameState.Finish);
                     }
                     else
                     {
-                        fuel -= 200.0f;
-                        if (fuel < 0.0f)
-                        {
-                            fuel = 0.0f;
-                        }
-                        GameBehaviour.changeGameState(GameBehaviour.GameState.Standby);
+                        removeFuel();
                     }
                 }
             }
             if (collision.gameObject.tag.Equals("MoonSurface"))
             {
-                //Make the lander explode
-                Debug.Log("You lose. Collision on a wall");
                 if (fuel <= 0.0f)
                 {
-                    Debug.Log("Game Over, you ran out of fuel");
+                    lander_animator.SetTrigger("LanderExplosion");
                     GameBehaviour.changeGameState(GameBehaviour.GameState.Finish);
                 }
                 else
                 {
-                    fuel -= 200.0f;
-                    if (fuel < 0.0f)
-                    {
-                        fuel = 0.0f;
-                    }
-                    GameBehaviour.changeGameState(GameBehaviour.GameState.Standby);
+                    removeFuel();
                 }
             }
             has_collided = true;
