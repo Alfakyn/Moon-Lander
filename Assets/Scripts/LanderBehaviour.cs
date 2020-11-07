@@ -15,7 +15,7 @@ public class LanderBehaviour : MonoBehaviour
     public DisplayBehaviour display_behaviour;
     private const int BASE_SCORE = 50;
     private const int WORSE_SCORE = 15;
-    private const float INITIAL_FUEL = 250;
+    private const float INITIAL_FUEL = 1000;
     private const float FUEL_DEPLETE_RATE = 10.0f;
     private const float FUEL_LOST_ON_EXPLOSION = 200.0f;
 
