@@ -24,6 +24,9 @@ public class LanderBehaviour : MonoBehaviour
 
     private bool has_collided;
 
+    public AudioSource audioSource;
+    private float audio__source_volume = 0.3f;
+
     //public Animator butt_fire_animator;
     public Animator lander_animator;
 
@@ -35,6 +38,8 @@ public class LanderBehaviour : MonoBehaviour
         fuel = INITIAL_FUEL;
 
         z_rotation = 0.0f;
+
+        audioSource.volume = 0.0f;
     }
 
     public void initializeLander()
@@ -63,9 +68,14 @@ public class LanderBehaviour : MonoBehaviour
                 break;
         }
 
+        if (Input.GetKeyDown(KeyCode.UpArrow) == true || Input.GetKeyDown(KeyCode.W) == true)
+        {
+            audioSource.volume = audio__source_volume;
+        }
         if (Input.GetKeyUp(KeyCode.UpArrow) == true || Input.GetKeyUp(KeyCode.W) == true)
         {
             lander_animator.SetBool("BoosterInput", false);
+            audioSource.volume = 0.0f;
         }
     }
 
