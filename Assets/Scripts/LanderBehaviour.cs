@@ -72,7 +72,7 @@ public class LanderBehaviour : MonoBehaviour
         {
             audioSource.volume = audio__source_volume;
         }
-        if (Input.GetKeyUp(KeyCode.UpArrow) == true || Input.GetKeyUp(KeyCode.W) == true)
+        if (Input.GetKeyUp(KeyCode.UpArrow) == true || Input.GetKeyUp(KeyCode.W) == true || fuel<0.0f)
         {
             lander_animator.SetBool("BoosterInput", false);
             audioSource.volume = 0.0f;
