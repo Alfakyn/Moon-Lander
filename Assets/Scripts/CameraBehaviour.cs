@@ -45,10 +45,18 @@ public class CameraBehaviour : MonoBehaviour
         if (lander_transform.position.x < -(screen_width/4.0f))
         {
             transform.position = new Vector3(-(screen_width / 4.0f), lander_transform.position.y, transform.position.z);
+            if (lander_transform.position.y < -(screen_heigth / 4))
+            {
+                transform.position = new Vector3(-(screen_width / 4.0f), -(screen_heigth / 4), transform.position.z);
+            }
         }
         else if(lander_transform.position.x > (screen_width / 4.0f))
         {
             transform.position = new Vector3((screen_width / 4.0f), lander_transform.position.y, transform.position.z);
+            if (lander_transform.position.y < -(screen_heigth / 4))
+            {
+                transform.position = new Vector3((screen_width / 4.0f), -(screen_heigth / 4), transform.position.z);
+            }
         }
         else if(lander_transform.position.y < -(screen_heigth/4))
         {
