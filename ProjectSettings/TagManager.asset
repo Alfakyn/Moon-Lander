@@ -8,6 +8,7 @@ TagManager:
   - MoonSurface
   - Display
   - Standby Message
+  - Background
   layers:
   - Default
   - TransparentFX

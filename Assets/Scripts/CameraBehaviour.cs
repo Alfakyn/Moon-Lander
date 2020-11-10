@@ -19,7 +19,7 @@ public class CameraBehaviour : MonoBehaviour
     private CameraState camera_state;
 
     public LanderBehaviour lander_behaviour;
-    private const float ALTITUDE_ZOOM_THRESHOLD = 100.0f;
+    private const float ALTITUDE_ZOOM_THRESHOLD = 120.0f;
 
     // Start is called before the first frame update
     void Start()

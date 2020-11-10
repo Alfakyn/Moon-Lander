@@ -187,6 +187,34 @@ public class LanderBehaviour : MonoBehaviour
         AudioSource.PlayClipAtPoint(explosion_audio_clip, transform.position, AUDIO_CLIPS_VOLUME);
     }
 
+    private void checkFuelOnOutOfBounds()
+    {
+        if (fuel <= 0.0f)
+        {
+            GameBehaviour.changeGameState(GameBehaviour.GameState.Finish);
+        }
+        else
+        {
+            float actual_fuel_lost;
+
+            if (fuel < FUEL_LOST_ON_EXPLOSION)
+            {
+                actual_fuel_lost = fuel;
+            }
+            else
+            {
+                actual_fuel_lost = FUEL_LOST_ON_EXPLOSION;
+            }
+
+            fuel -= actual_fuel_lost;
+
+            display_behaviour.updateStandbyMessage("Your lander dissapeared\n" + ((int)actual_fuel_lost).ToString() + " units of fuel lost");
+            GameBehaviour.changeGameState(GameBehaviour.GameState.Standby);
+        }
+
+        lander_animator.SetTrigger("LanderExplosion");
+    }
+
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (has_collided == false)
@@ -225,6 +253,10 @@ public class LanderBehaviour : MonoBehaviour
             {
                 checkFuelOnCrash();
             }
+            //if (collision.gameObject.tag.Equals("Background"))
+            //{
+            //    checkFuelOnOutOfBounds();
+            //}
             has_collided = true;
         }
     }
