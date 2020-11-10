@@ -24,8 +24,9 @@ public class LanderBehaviour : MonoBehaviour
 
     private bool has_collided;
 
-    public AudioSource audioSource;
-    private float audio__source_volume = 0.3f;
+    public AudioSource boosters_audio_source;
+    private const float AUDIO_CLIPS_VOLUME = 0.3f;
+    public AudioClip explosion_audio_clip;
 
     public Animator lander_animator;
 
@@ -40,7 +41,7 @@ public class LanderBehaviour : MonoBehaviour
 
         z_rotation = 0.0f;
 
-        audioSource.volume = 0.0f;
+        boosters_audio_source.volume = 0.0f;
 
         altitude = 0.0f;
     }
@@ -73,12 +74,12 @@ public class LanderBehaviour : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.UpArrow) == true || Input.GetKeyDown(KeyCode.W) == true)
         {
-            audioSource.volume = audio__source_volume;
+            boosters_audio_source.volume = AUDIO_CLIPS_VOLUME;
         }
         if (Input.GetKeyUp(KeyCode.UpArrow) == true || Input.GetKeyUp(KeyCode.W) == true || fuel<0.0f)
         {
             lander_animator.SetBool("BoosterInput", false);
-            audioSource.volume = 0.0f;
+            boosters_audio_source.volume = 0.0f;
         }
     }
 
@@ -157,24 +158,33 @@ public class LanderBehaviour : MonoBehaviour
         return fuel;
     }
 
-    private void removeFuel()
+    private void checkFuelOnCrash()
     {
-        float actual_fuel_lost;
-
-        if (fuel < FUEL_LOST_ON_EXPLOSION)
-        {
-            actual_fuel_lost = fuel;
+        if (fuel <= 0.0f)
+        {            
+            GameBehaviour.changeGameState(GameBehaviour.GameState.Finish);
         }
         else
         {
-            actual_fuel_lost = FUEL_LOST_ON_EXPLOSION;
+            float actual_fuel_lost;
+
+            if (fuel < FUEL_LOST_ON_EXPLOSION)
+            {
+                actual_fuel_lost = fuel;
+            }
+            else
+            {
+                actual_fuel_lost = FUEL_LOST_ON_EXPLOSION;
+            }
+
+            fuel -= actual_fuel_lost;
+
+            display_behaviour.updateStandbyMessage("Your lander exploded\n" + ((int)actual_fuel_lost).ToString() + " units of fuel lost");
+            GameBehaviour.changeGameState(GameBehaviour.GameState.Standby);
         }
 
-        fuel -= actual_fuel_lost;
-
-        display_behaviour.updateStandbyMessage("Your lander exploded\n" + ((int)actual_fuel_lost).ToString() + " units of fuel lost");
         lander_animator.SetTrigger("LanderExplosion");
-        GameBehaviour.changeGameState(GameBehaviour.GameState.Standby);
+        AudioSource.PlayClipAtPoint(explosion_audio_clip, transform.position, AUDIO_CLIPS_VOLUME);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -202,42 +212,18 @@ public class LanderBehaviour : MonoBehaviour
                         GameBehaviour.changeGameState(GameBehaviour.GameState.Standby);
                     }
                     else
-                    {                        
-                        if (fuel <= 0.0f)
-                        {
-                            lander_animator.SetTrigger("LanderExplosion");
-                            GameBehaviour.changeGameState(GameBehaviour.GameState.Finish);
-                        }
-                        else
-                        {
-                            removeFuel();
-                        }
+                    {
+                        checkFuelOnCrash();
                     }
                 }
                 else
-                {                    
-                    if (fuel <= 0.0f)
-                    {
-                        lander_animator.SetTrigger("LanderExplosion");
-                        GameBehaviour.changeGameState(GameBehaviour.GameState.Finish);
-                    }
-                    else
-                    {
-                        removeFuel();
-                    }
+                {
+                    checkFuelOnCrash();
                 }
             }
             if (collision.gameObject.tag.Equals("MoonSurface"))
             {
-                if (fuel <= 0.0f)
-                {
-                    lander_animator.SetTrigger("LanderExplosion");
-                    GameBehaviour.changeGameState(GameBehaviour.GameState.Finish);
-                }
-                else
-                {
-                    removeFuel();
-                }
+                checkFuelOnCrash();
             }
             has_collided = true;
         }
@@ -248,8 +234,6 @@ public class LanderBehaviour : MonoBehaviour
         Vector2 starting_point = transform.position - 13 * transform.up;
         RaycastHit2D raycast_hit_2d = Physics2D.Raycast(starting_point, Vector2.down);
         altitude = raycast_hit_2d.distance;
-
-        Debug.Log(raycast_hit_2d.distance);
     }
 
     public float getAltitude()
