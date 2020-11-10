@@ -240,7 +240,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 150}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &20213932
@@ -2902,7 +2902,7 @@ MonoBehaviour:
   rigidbody2d: {fileID: 584527017}
   display_behaviour: {fileID: 629590239}
   boosters_audio_source: {fileID: 584527019}
-  explosion_audio_clip: {fileID: 8300000, guid: 7484174876247234bbd6140ffe8b3360,
+  explosion_audio_clip: {fileID: 8300000, guid: a450abc695cdd3c408395b86cbb82bec,
     type: 3}
   lander_animator: {fileID: 320613276}
 --- !u!50 &584527017
