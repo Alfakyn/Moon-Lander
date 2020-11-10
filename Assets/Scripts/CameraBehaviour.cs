@@ -18,6 +18,9 @@ public class CameraBehaviour : MonoBehaviour
     private enum CameraState {overview, zoom};
     private CameraState camera_state;
 
+    public LanderBehaviour lander_behaviour;
+    private const float ALTITUDE_ZOOM_THRESHOLD = 100.0f;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -27,8 +30,7 @@ public class CameraBehaviour : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //if(certain altitude achieved)
-        checkInput();
+        checkZoom();
 
         switch (camera_state)
         {
@@ -82,18 +84,17 @@ public class CameraBehaviour : MonoBehaviour
                 break;
         }
     }
-    private void checkInput() 
+
+    private void checkZoom()
     {
-        if (Input.GetKeyDown(KeyCode.Z))
+        float altitude = lander_behaviour.getAltitude();
+        if (altitude <= ALTITUDE_ZOOM_THRESHOLD && camera_state == CameraState.overview)
         {
-            if (camera_state == CameraState.overview)
-            {
-                changeCameraState(CameraState.zoom);
-            }
-            else
-            {
-                changeCameraState(CameraState.overview);
-            }
+            changeCameraState(CameraState.zoom);
+        }
+        else if (altitude > ALTITUDE_ZOOM_THRESHOLD && camera_state == CameraState.zoom)
+        {
+            changeCameraState(CameraState.overview);
         }
     }
 }

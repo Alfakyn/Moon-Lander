@@ -27,8 +27,9 @@ public class LanderBehaviour : MonoBehaviour
     public AudioSource audioSource;
     private float audio__source_volume = 0.3f;
 
-    //public Animator butt_fire_animator;
     public Animator lander_animator;
+
+    private float altitude;
 
     // Start is called before the first frame update
     void Start()
@@ -40,6 +41,8 @@ public class LanderBehaviour : MonoBehaviour
         z_rotation = 0.0f;
 
         audioSource.volume = 0.0f;
+
+        altitude = 0.0f;
     }
 
     public void initializeLander()
@@ -92,6 +95,7 @@ public class LanderBehaviour : MonoBehaviour
                 {
                     lander_animator.SetBool("BoosterInput", false);
                 }
+                calculateAltitude();
                 checkHorizontalDrag();
                 speed_x = rigidbody2d.velocity.x;
                 speed_y = rigidbody2d.velocity.y;
@@ -237,5 +241,19 @@ public class LanderBehaviour : MonoBehaviour
             }
             has_collided = true;
         }
+    }
+
+    private void calculateAltitude()
+    {
+        Vector2 starting_point = transform.position - 13 * transform.up;
+        RaycastHit2D raycast_hit_2d = Physics2D.Raycast(starting_point, Vector2.down);
+        altitude = raycast_hit_2d.distance;
+
+        Debug.Log(raycast_hit_2d.distance);
+    }
+
+    public float getAltitude()
+    {
+        return altitude;
     }
 }

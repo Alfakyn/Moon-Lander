@@ -12,7 +12,6 @@ public class DisplayBehaviour : MonoBehaviour
     public TextMeshProUGUI standby_message_TMP;
 
     private int score;
-    //private int altitude;   //to implement
     private float time;
 
     public GameObject end_screen;
@@ -22,8 +21,6 @@ public class DisplayBehaviour : MonoBehaviour
     {
         time = 0.0f;
         score = 0;
-
-        //altitude = 0;  // to implement
 
         score_value_TMP.text = "0000";
 
@@ -38,6 +35,7 @@ public class DisplayBehaviour : MonoBehaviour
             updateTime();
             updateSpeeds();
             updateFuel();
+            updateAltitude();
         }
         else
         {
@@ -99,5 +97,17 @@ public class DisplayBehaviour : MonoBehaviour
     public void updateStandbyMessage(string message)
     {
         standby_message_TMP.text = message;
+    }
+
+    void updateAltitude()
+    {
+        int altitude = (int)lander_behaviour.getAltitude();
+
+        int thousands = altitude / 1000;
+        int hundreds = (altitude % 1000) / 100;
+        int tens = (altitude % 100) / 10;
+        int units = altitude % 10;
+
+        altitude_value_TMP.text = thousands.ToString() + hundreds.ToString() + tens.ToString() + units.ToString();
     }
 }
