@@ -208,7 +208,7 @@ public class LanderBehaviour : MonoBehaviour
 
             fuel -= actual_fuel_lost;
 
-            display_behaviour.updateStandbyMessage("Your lander dissapeared\n" + ((int)actual_fuel_lost).ToString() + " units of fuel lost");
+            display_behaviour.updateStandbyMessage("Your lander disappeared\n" + ((int)actual_fuel_lost).ToString() + " units of fuel lost");
             GameBehaviour.changeGameState(GameBehaviour.GameState.Standby);
         }
 
@@ -253,10 +253,10 @@ public class LanderBehaviour : MonoBehaviour
             {
                 checkFuelOnCrash();
             }
-            //if (collision.gameObject.tag.Equals("Background"))
-            //{
-            //    checkFuelOnOutOfBounds();
-            //}
+            if (collision.gameObject.tag.Equals("Background"))
+            {
+                checkFuelOnOutOfBounds();
+            }
             has_collided = true;
         }
     }
