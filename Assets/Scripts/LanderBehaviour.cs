@@ -69,18 +69,10 @@ public class LanderBehaviour : MonoBehaviour
                 convertZRotation();
                 break;
             case GameBehaviour.GameState.Standby:
+                boosters_audio_source.volume = 0.0f;
                 break;
         }
-
-        if (Input.GetKeyDown(KeyCode.UpArrow) == true || Input.GetKeyDown(KeyCode.W) == true)
-        {
-            boosters_audio_source.volume = AUDIO_CLIPS_VOLUME;
-        }
-        if (Input.GetKeyUp(KeyCode.UpArrow) == true || Input.GetKeyUp(KeyCode.W) == true || fuel<0.0f)
-        {
-            lander_animator.SetBool("BoosterInput", false);
-            boosters_audio_source.volume = 0.0f;
-        }
+        checkBoosterPressed();
     }
 
     private void FixedUpdate()
@@ -120,6 +112,19 @@ public class LanderBehaviour : MonoBehaviour
             rigidbody2d.velocity += new Vector2(transform.up.x, transform.up.y) * ACCELERATION * gravity_scale * Time.fixedDeltaTime;
             fuel -= FUEL_DEPLETE_RATE * Time.fixedDeltaTime;
             lander_animator.SetBool("BoosterInput", true);
+        }
+    }
+
+    void checkBoosterPressed()
+    {
+        if (Input.GetKey(KeyCode.UpArrow) == true && GameBehaviour.game_state == GameBehaviour.GameState.Running || Input.GetKey(KeyCode.W) == true && GameBehaviour.game_state == GameBehaviour.GameState.Running)
+        {
+            boosters_audio_source.volume = AUDIO_CLIPS_VOLUME;
+        }
+        if (Input.GetKeyUp(KeyCode.UpArrow) == true || Input.GetKeyUp(KeyCode.W) == true || fuel < 0.0f)
+        {
+            lander_animator.SetBool("BoosterInput", false);
+            boosters_audio_source.volume = 0.0f;
         }
     }
 

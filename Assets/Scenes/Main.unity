@@ -2137,7 +2137,7 @@ AudioListener:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!114 &519420030
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2814,6 +2814,7 @@ GameObject:
   - component: {fileID: 584527016}
   - component: {fileID: 584527018}
   - component: {fileID: 584527019}
+  - component: {fileID: 584527020}
   m_Layer: 2
   m_Name: Moon Lander
   m_TagString: Player
@@ -3055,6 +3056,14 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!81 &584527020
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 584527013}
+  m_Enabled: 1
 --- !u!1 &585971946
 GameObject:
   m_ObjectHideFlags: 0
